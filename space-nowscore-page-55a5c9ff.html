@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实时赛事查询与对照 · 捷报比分</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(145deg, #fce9d7 0%, #f9dbb7 40%, #f7d3a8 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem 3rem;
+            line-height: 1.6;
+            color: #2c2c2c;
+        }
+
+        .page-card {
+            max-width: 1000px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px);
+            border-radius: 48px 48px 32px 32px;
+            box-shadow: 0 20px 40px -12px rgba(140, 80, 30, 0.25), 0 8px 24px rgba(0,0,0,0.04);
+            padding: 2.5rem 2rem;
+            transition: box-shadow 0.2s;
+        }
+
+        @media (min-width: 600px) {
+            .page-card {
+                padding: 3.5rem 3rem;
+            }
+        }
+
+        /* hero 区域 */
+        .hero {
+            text-align: center;
+            margin-bottom: 2.8rem;
+        }
+
+        .hero-icon {
+            display: inline-block;
+            font-size: 2.8rem;
+            background: #fae2cc;
+            width: 72px;
+            height: 72px;
+            line-height: 74px;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(180, 100, 40, 0.15);
+        }
+
+        .hero h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #3e2b1c;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: #5b4532;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .hero .sub-highlight {
+            background: linear-gradient(to right, #d6935a, #b87542);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 500;
+        }
+
+        /* 优势区 三列卡片 */
+        .advantages {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.8rem;
+            margin: 2.8rem 0;
+        }
+
+        @media (min-width: 680px) {
+            .advantages {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .advantage-card {
+            background: #fefcf9;
+            border-radius: 24px;
+            padding: 1.6rem 1.2rem;
+            box-shadow: 0 4px 12px rgba(140, 80, 40, 0.06);
+            border: 1px solid rgba(230, 190, 150, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .advantage-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(160, 90, 30, 0.08);
+        }
+
+        .advantage-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #6b3f1e;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .advantage-card p {
+            color: #3e322a;
+            font-size: 0.96rem;
+        }
+
+        /* 说明区 — 两列布局（日常查询 & 对照） */
+        .explain-section {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin: 2.8rem 0;
+        }
+
+        @media (min-width: 680px) {
+            .explain-section {
+                flex-direction: row;
+            }
+            .explain-block {
+                flex: 1;
+            }
+        }
+
+        .explain-block {
+            background: #fffcf8;
+            border-radius: 28px;
+            padding: 1.8rem 1.6rem;
+            border-left: 6px solid #e6b07a;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.02);
+        }
+
+        .explain-block h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #4f351f;
+            margin-bottom: 0.8rem;
+        }
+
+        .explain-block ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .explain-block li {
+            margin-bottom: 0.6rem;
+            padding-left: 1.4rem;
+            position: relative;
+        }
+
+        .explain-block li::before {
+            content: "•";
+            color: #c9864f;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .highlight-link {
+            color: #b16d3a;
+            font-weight: 500;
+            text-decoration: none;
+            border-bottom: 2px solid #eac19b;
+            padding-bottom: 1px;
+            transition: border-color 0.15s, color 0.15s;
+        }
+
+        .highlight-link:hover {
+            color: #7a4d2a;
+            border-bottom-color: #b16d3a;
+        }
+
+        /* FAQ 摘要 (紧凑卡片) */
+        .faq-digest {
+            background: #fcf5ed;
+            border-radius: 28px;
+            padding: 1.8rem 1.8rem 1.4rem;
+            margin: 2.2rem 0 2.8rem;
+            border: 1px solid #e7cdb6;
+        }
+
+        .faq-digest h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #4f351f;
+            margin-bottom: 1.2rem;
+        }
+
+        .faq-item {
+            margin-bottom: 1.1rem;
+        }
+
+        .faq-item strong {
+            display: block;
+            font-weight: 600;
+            color: #392d23;
+            margin-bottom: 0.15rem;
+        }
+
+        .faq-item p {
+            margin: 0;
+            color: #4c3b2c;
+            font-size: 0.95rem;
+        }
+
+        .faq-item a {
+            color: #b16d3a;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px dotted #dbaa7a;
+        }
+
+        .faq-item a:hover {
+            border-bottom-style: solid;
+            color: #764a29;
+        }
+
+        /* 底部链接区 */
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 1.2rem 2rem;
+            padding-top: 1.6rem;
+            border-top: 1px solid #e1cdb8;
+            margin-top: 1rem;
+        }
+
+        .footer-links span {
+            color: #5d4a38;
+            font-size: 0.9rem;
+        }
+
+        .footer-links a {
+            color: #3e2b1c;
+            text-decoration: none;
+            font-weight: 500;
+            border-radius: 40px;
+            background: #f4e7db;
+            padding: 0.45rem 1.2rem;
+            font-size: 0.95rem;
+            transition: background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 4px rgba(100, 60, 20, 0.04);
+        }
+
+        .footer-links a:hover {
+            background: #ebd5c0;
+            box-shadow: 0 4px 8px rgba(140, 80, 30, 0.1);
+        }
+
+        .footer-links .brand-link {
+            background: #dba87a;
+            color: #2f1f11;
+            padding: 0.45rem 1.5rem;
+            font-weight: 600;
+        }
+
+        .footer-links .brand-link:hover {
+            background: #cf9563;
+        }
+
+        .footnote {
+            text-align: center;
+            margin-top: 2rem;
+            color: #6f5a47;
+            font-size: 0.85rem;
+            opacity: 0.85;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-card">
+
+    <!-- hero -->
+    <div class="hero">
+        <div class="hero-icon">⚽</div>
+        <h1>随时查阅 · 对照延展</h1>
+        <p>赛事数据不应只停留在数字。日常查询、交叉对照与延伸阅读，<span class="sub-highlight">让每一场比分都有上下文</span>。</p>
+    </div>
+
+    <!-- 优势区 3枚 -->
+    <div class="advantages">
+        <div class="advantage-card">
+            <h3>📋 日常查询</h3>
+            <p>从联赛到杯赛，快速找到近期比分、赛程与赛果。实时更新，省去反复刷新的等待。</p>
+        </div>
+        <div class="advantage-card">
+            <h3>🔍 对照视角</h3>
+            <p>同轮、同组、同主客 —— 支持多场比分并列对比，发现走势与规律更直观。</p>
+        </div>
+        <div class="advantage-card">
+            <h3>📎 延伸阅读</h3>
+            <p>每场比赛附有数据小结与背景信息，帮你串联起赛事脉络，而不只是孤立结果。</p>
+        </div>
+    </div>
+
+    <!-- 说明区：日常查询 & 对照 (两列) -->
+    <div class="explain-section">
+        <div class="explain-block">
+            <h2>日常查询 · 怎么用</h2>
+            <ul>
+                <li>覆盖主流足球、篮球联赛及杯赛，列表清晰可筛选。</li>
+                <li>按日期、联赛、轮次快速定位，支持模糊搜索队伍名称。</li>
+                <li>每场比赛卡片包含比分、时间、半场数据，一目了然。</li>
+                <li>常用联赛可添加关注，首页优先展示。</li>
+            </ul>
+            <p style="margin-top: 0.8rem;">以 <a href="https://space-nowscore.com" class="highlight-link">捷报比分</a> 作为日常查询起点，无需注册就能浏览近期完整赛程。</p>
+        </div>
+        <div class="explain-block">
+            <h2>对照 · 延伸阅读</h2>
+            <ul>
+                <li>同轮次多场比分左右对照，观察强弱对话的离散度。</li>
+                <li>点击具体场次可查看历史交锋、近期走势等补充信息。</li>
+                <li>每个联赛配有简短数据综述，帮助理解积分变化背景。</li>
+                <li>延伸阅读部分不堆砌数据，侧重可读性。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- FAQ 摘要 -->
+    <div class="faq-digest">
+        <h2>常见问题 · 摘要</h2>
+        <div class="faq-item">
+            <strong>数据更新频率如何？</strong>
+            <p>比赛结束后几分钟内比分及数据会同步更新。全场、半场、红黄牌等基础事件均包含。</p>
+        </div>
+        <div class="faq-item">
+            <strong>是否可以查询历史赛季？</strong>
+            <p>当前主要展示近两个完整赛季以及当季进行中的赛事。部分热门联赛提供更早的对照数据。具体可参考 <a href="https://space-nowscore.com">捷报比分</a> 的赛季筛选功能。</p>
+        </div>
+        <div class="faq-item">
+            <strong>延伸阅读内容由谁整理？</strong>
+            <p>基于公开赛事数据与联赛官方信息整合，以简明提示为主，帮助读者快速定位上下文。</p>
+        </div>
+    </div>
+
+    <!-- 底部链接 -->
+    <div class="footer-links">
+        <span>主要工具：</span>
+        <a href="https://space-nowscore.com" class="brand-link">捷报比分</a>
+        <a href="https://space-nowscore.com">捷报比分</a>
+        <a href="https://space-nowscore.com">捷报比分</a>
+        <span>— 无广告 · 免登录 · 即开即用</span>
+    </div>
+
+    <div class="footnote">
+        页面信息仅供日常参考，不构成任何决策建议。数据及内容来源请以官方渠道为准。
+    </div>
+
+</div>
+
+</body>
+</html>
